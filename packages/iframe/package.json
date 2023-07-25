@@ -2,7 +2,7 @@
   "name": "iframe",
   "version": "0.0.0",
   "scripts": {
-    "start": "serve dist -l 3001"
+    "dev": "serve dist -l 3001"
   },
   "devDependencies": {
     "serve": "^14.2.0"
