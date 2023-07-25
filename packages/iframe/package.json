@@ -2,9 +2,11 @@
   "name": "iframe",
   "version": "0.0.0",
   "scripts": {
-    "dev": "serve dist -l 3001"
+    "dev": "serve dist -l 3001",
+    "build": "tsc"
   },
   "devDependencies": {
-    "serve": "^14.2.0"
+    "serve": "^14.2.0",
+    "typescript": "^5.1.6"
   }
 }
