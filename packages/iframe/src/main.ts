@@ -11,14 +11,17 @@ window.addEventListener("message", (event) => {
   const value = event.data?.value;
 
   const postResponse = (args: { value?: string | null; error?: string }) => {
-    window.parent.postMessage({
-      target: Target.RESPONSE,
-      id,
-      action,
-      key,
-      value: args.value ?? value,
-      error: args.error,
-    });
+    window.parent.postMessage(
+      {
+        target: Target.RESPONSE,
+        id,
+        action,
+        key,
+        value: args.value ?? value,
+        error: args.error,
+      },
+      origin
+    );
   };
 
   try {
@@ -38,7 +41,7 @@ window.addEventListener("message", (event) => {
     }
 
     // Fail if the message does not have a supported action.
-    if (!(action in Action)) {
+    if (!Object.values(Action).includes(action)) {
       throw new Error(`Action ${action} is not supported`);
     }
 
