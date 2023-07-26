@@ -6,6 +6,6 @@ export enum Action {
 }
 
 export enum Target {
-  REQUEST = "single-sign-on-request",
-  RESPONSE = "single-sign-on-response",
+  REQUEST = "iframe-local-storage-request",
+  RESPONSE = "iframe-local-storage-response",
 }

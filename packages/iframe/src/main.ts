@@ -15,9 +15,7 @@ window.addEventListener("message", (event) => {
       {
         target: Target.RESPONSE,
         id,
-        action,
-        key,
-        value: args.value ?? value,
+        value: args.value,
         error: args.error,
       },
       origin
@@ -46,13 +44,13 @@ window.addEventListener("message", (event) => {
     }
 
     // Fails if the key provided is not a string.
-    if ([Action.SET, Action.GET, Action.REMOVE].includes(action) && typeof key !== "string") {
-      throw new Error("Key must be a string");
+    if ([Action.SET, Action.GET, Action.REMOVE].includes(action) && (typeof key !== "string" || !key.length)) {
+      throw new Error("Key must be a non empty string");
     }
 
     // Fails if the value provided is not a string.
-    if ([Action.SET].includes(action) && typeof value !== "string") {
-      throw new Error("Value must be a string");
+    if ([Action.SET].includes(action) && (typeof value !== "string" || !value.length)) {
+      throw new Error("Value must be a non empty string");
     }
 
     switch (action as Action) {
