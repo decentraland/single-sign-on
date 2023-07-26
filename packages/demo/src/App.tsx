@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import React, { useState } from "react";
+import { useIframeLocalStorage } from "./components/IframeLocalStorage.hooks";
 
 function App() {
-  const [id, setId] = useState(1);
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const { set, get, remove, clear } = useIframeLocalStorage();
 
   return (
     <>
@@ -16,34 +17,57 @@ function App() {
           <Input label="key" onChange={(e) => setKey(e.target.value)} />
           <Input label="value" onChange={(e) => setValue(e.target.value)} />
         </div>
-        <div style={{ display: "flex", gap: ".5rem", marginTop: ".5rem" }}>
+        <div style={{ marginTop: ".5rem", display: "flex", gap: ".5rem" }}>
           <button
-            onClick={() => {
-              const cw = iframeRef.current?.contentWindow;
-
-              if (cw) {
-                cw.postMessage({ id, action: "set", key, value }, "*");
+            onClick={async () => {
+              try {
+                await set(key, value);
+                console.log("set!");
+              } catch (e) {
+                console.log((e as Error).message);
               }
             }}
           >
             SET
           </button>
           <button
-            onClick={() => {
-              const cw = iframeRef.current?.contentWindow;
-
-              if (cw) {
-                cw.postMessage({ id, action: "get", key }, "*");
+            onClick={async () => {
+              try {
+                const val = await get(key);
+                console.log("get!", val);
+              } catch (e) {
+                console.log((e as Error).message);
               }
-
-              setId((id) => id + 1);
             }}
           >
             GET
           </button>
+          <button
+            onClick={async () => {
+              try {
+                await remove(key);
+                console.log("remove!");
+              } catch (e) {
+                console.log((e as Error).message);
+              }
+            }}
+          >
+            REMOVE
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await clear();
+                console.log("clear!");
+              } catch (e) {
+                console.log((e as Error).message);
+              }
+            }}
+          >
+            CLEAR
+          </button>
         </div>
       </main>
-      <iframe style={{ marginTop: "1rem" }} ref={iframeRef} src="http://localhost:3001"></iframe>
     </>
   );
 }
@@ -56,7 +80,5 @@ function Input({ label, onChange }: { label: string; onChange: (e: React.ChangeE
     </label>
   );
 }
-
-
 
 export default App;
