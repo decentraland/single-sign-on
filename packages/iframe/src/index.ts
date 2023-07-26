@@ -1,119 +1,83 @@
-const acceptedActions: string[] = ["set", "get", "remove", "clear"];
-const acceptedKeys: string[] = [];
+import { Action, Target } from "./types";
+
 const acceptedOrigins: string[] = [];
 
 window.addEventListener("message", (event) => {
-  console.log("message received", event.origin, JSON.stringify(event.data, null, 2));
+  const origin = event.origin;
+  const target = event.data?.target;
+  const id = event.data?.id;
+  const action = event.data?.action;
+  const key = event.data?.key;
+  const value = event.data?.value;
 
-  if (event.data?.target !== "single-sign-on") {
-    return;
-  }
-
-  let id;
-  let action;
-
-  try {
-    const origin = event.origin;
-
-    if (acceptedOrigins.length && !acceptedOrigins.includes(origin)) {
-      throw new Error("Origin is not accepted");
-    }
-
-    const message = event.data;
-
-    if (!message) {
-      throw new Error("Message cannot be null or undefined");
-    }
-
-    id = message.id;
-
-    if (!id) {
-      throw new Error("Message must have an id");
-    }
-
-    action = message.action;
-
-    if (!acceptedActions.includes(action)) {
-      throw new Error("Action is not supported");
-    }
-
-    switch (action) {
-      case "set": {
-        const { key, value } = message;
-
-        verifyKey(key);
-
-        if (typeof value !== "string") {
-          throw new Error("Value must be a string");
-        }
-
-        localStorage.setItem(key, value);
-
-        postResponse(origin, id, action, key);
-
-        break;
-      }
-      case "get": {
-        const { key } = message;
-
-        verifyKey(key);
-
-        postResponse(origin, id, action, key, localStorage.getItem(key) ?? undefined);
-
-        break;
-      }
-      case "remove": {
-        const { key } = message;
-
-        verifyKey(key);
-
-        localStorage.removeItem(key);
-
-        postResponse(origin, id, action, key);
-
-        break;
-      }
-
-      case "clear": {
-        localStorage.clear();
-
-        postResponse(origin, id, action);
-      }
-    }
-  } catch (e) {
-    postError(origin, id, action, (e as Error).message);
-  }
-});
-
-function verifyKey(key: unknown) {
-  if (typeof key !== "string") {
-    throw new Error("Key must be a string");
-  }
-}
-
-function postResponse(origin: string, id: string, action: string, key?: string, value?: string) {
-  console.log("postResponse", origin, id, action, key, value);
-
-  window.parent.postMessage(
-    {
+  const postResponse = (args: { value?: string | null; error?: string }) => {
+    window.parent.postMessage({
+      target: Target.RESPONSE,
       id,
       action,
       key,
-      value,
-    },
-    origin
-  );
-}
+      value: args.value ?? value,
+      error: args.error,
+    });
+  };
 
-function postError(origin: string, id?: string, action?: string, error?: string) {
-  console.log("postError", origin, id, action, error);
+  try {
+    // Ignore messages that are not intended for us.
+    if (target !== Target.REQUEST) {
+      return;
+    }
 
-  window.parent.postMessage(
-    {
-      id,
-      action,
-      error,
-    },
-    origin
-  );
-}
+    // Fail if the origin is not accepted.
+    if (acceptedOrigins.length && !acceptedOrigins.includes(origin)) {
+      throw new Error(`Origin ${origin} is not accepted`);
+    }
+
+    // Fail if the message does no have a valid id.
+    if (typeof id !== "number" && typeof id !== "string") {
+      throw new Error("Id is required and must be a string or number");
+    }
+
+    // Fail if the message does not have a supported action.
+    if (!(action in Action)) {
+      throw new Error(`Action ${action} is not supported`);
+    }
+
+    // Fails if the key provided is not a string.
+    if ([Action.SET, Action.GET, Action.REMOVE].includes(action) && typeof key !== "string") {
+      throw new Error("Key must be a string");
+    }
+
+    // Fails if the value provided is not a string.
+    if ([Action.SET].includes(action) && typeof value !== "string") {
+      throw new Error("Value must be a string");
+    }
+
+    switch (action as Action) {
+      case Action.SET: {
+        localStorage.setItem(key, value);
+        postResponse({});
+        break;
+      }
+
+      case Action.GET: {
+        const value = localStorage.getItem(key);
+        postResponse({ value });
+        break;
+      }
+
+      case Action.REMOVE: {
+        localStorage.removeItem(key);
+        postResponse({});
+        break;
+      }
+
+      case Action.CLEAR: {
+        localStorage.clear();
+        postResponse({});
+      }
+    }
+  } catch (e) {
+    const message = (e as Error).message;
+    postResponse({ error: message });
+  }
+});
