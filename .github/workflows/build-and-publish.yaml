@@ -9,10 +9,14 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
       - run: npm ci
       - run: npx lerna run build --stream --parallel
-      - run: npx lerna publish from-package -y
+      - env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx lerna publish from-package -y
