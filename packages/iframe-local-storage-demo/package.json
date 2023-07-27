@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "iframe-local-storage-demo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
