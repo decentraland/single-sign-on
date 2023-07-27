@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useIframeLocalStorage } from "./components/IframeLocalStorage.hooks";
+import { Button } from "iframe-local-storage-react-client";
 
 function App() {
   const [key, setKey] = useState("");
@@ -13,6 +14,7 @@ function App() {
         <h1>Single Sign On - Demo</h1>
       </header>
       <main>
+        <Button />
         <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
           <Input label="key" onChange={(e) => setKey(e.target.value)} />
           <Input label="value" onChange={(e) => setValue(e.target.value)} />
