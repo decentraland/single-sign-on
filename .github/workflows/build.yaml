@@ -1,4 +1,4 @@
-name: Build
+name: Build & Publish
 
 on:
   push:
@@ -15,3 +15,4 @@ jobs:
           node-version: 18.x
       - run: npm ci
       - run: npx lerna run build --stream --parallel
+      - run: npx lerna publish from-package -y
