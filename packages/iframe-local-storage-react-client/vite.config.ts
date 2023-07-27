@@ -11,7 +11,7 @@ export default defineConfig({
       entry: resolve(__dirname, "src/main.ts"),
       name: "Iframe Local Storage React Client",
       fileName: "main",
-      formats: ["es", "cjs"],
+      formats: ["es"],
     },
     rollupOptions: {
       external: ["react", "react-dom"],
