@@ -1,5 +1,5 @@
-import { useIframeLocalStorage } from "iframe-local-storage-react-client";
 import React, { useState } from "react";
+import { useIframeLocalStorage } from "@dcl/iframe-local-storage-react-client";
 
 function App() {
   const [key, setKey] = useState("");

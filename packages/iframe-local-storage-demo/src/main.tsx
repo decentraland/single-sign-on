@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { IframeLocalStorage } from "@dcl/iframe-local-storage-react-client";
 import App from "./App.tsx";
-import { IframeLocalStorage } from "iframe-local-storage-react-client";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
