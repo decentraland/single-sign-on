@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dcl/iframe-local-storage-react-client": "file:../iframe-local-storage-react-client",
+    "@dcl/iframe-local-storage-react-client": "^0.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
