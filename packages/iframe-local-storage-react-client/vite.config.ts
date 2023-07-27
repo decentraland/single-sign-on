@@ -13,5 +13,8 @@ export default defineConfig({
       fileName: "main",
       formats: ["es", "cjs"],
     },
+    rollupOptions: {
+      external: ["react", "react-dom"],
+    },
   },
 });
