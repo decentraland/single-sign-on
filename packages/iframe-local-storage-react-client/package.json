@@ -1,5 +1,5 @@
 {
-  "name": "iframe-local-storage-react-client",
+  "name": "@dcl/iframe-local-storage-react-client",
   "version": "0.0.1",
   "type": "module",
   "main": "dist/main.js",

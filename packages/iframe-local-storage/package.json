@@ -1,5 +1,5 @@
 {
-  "name": "iframe-local-storage",
+  "name": "@dcl/iframe-local-storage",
   "version": "0.0.1",
   "type": "module",
   "scripts": {
