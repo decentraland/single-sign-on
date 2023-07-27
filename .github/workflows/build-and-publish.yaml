@@ -17,6 +17,7 @@ jobs:
           node-version: 18.x
       - run: npm ci
       - run: npx lerna run build --stream --parallel
-      - run: npx lerna publish from-package -y
+      - name: Publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx lerna publish from-package -y
