@@ -1,11 +1,18 @@
 export enum Action {
-  SET = "set",
   GET = "get",
-  REMOVE = "remove",
+  STORE = "store",
   CLEAR = "clear",
 }
 
-export enum Target {
-  REQUEST = "iframe-local-storage-request",
-  RESPONSE = "iframe-local-storage-response",
-}
+export type Payload = {
+  target?: any;
+  id?: any;
+  action?: any;
+  user?: any;
+  identity?: any;
+};
+
+export type PostMessageExtraArgs = {
+  identity?: string | null;
+  error?: string;
+};

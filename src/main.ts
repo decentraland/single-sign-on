@@ -1,84 +1,69 @@
-import { Action, Target } from "./types";
+import { Action, Payload, PostMessageExtraArgs } from "./types";
 
 const acceptedOrigins: string[] = [];
+const expectedTarget = "single-sign-on";
 
-window.addEventListener("message", (event) => {
-  const origin = event.origin;
-  const target = event.data?.target;
-  const id = event.data?.id;
-  const action = event.data?.action;
-  const key = event.data?.key;
-  const value = event.data?.value;
+window.addEventListener("message", (event: MessageEvent<Payload | null | undefined>) => {
+  const { origin, data } = event;
 
-  const postResponse = (args: { value?: string | null; error?: string }) => {
+  if (!data) {
+    return;
+  }
+
+  const { target, id, action, user, identity } = data;
+
+  if (target !== expectedTarget) {
+    return;
+  }
+
+  const postMessage = (extra: PostMessageExtraArgs = {}) => {
     window.parent.postMessage(
       {
-        target: Target.RESPONSE,
+        target: expectedTarget,
         id,
-        value: args.value,
-        error: args.error,
+        ...extra,
       },
       origin
     );
   };
 
   try {
-    // Ignore messages that are not intended for us.
-    if (target !== Target.REQUEST) {
-      return;
+    if (!acceptedOrigins.includes(origin)) {
+      throw new Error(`Origin is not accepted`);
     }
 
-    // Fail if the origin is not accepted.
-    if (acceptedOrigins.length && !acceptedOrigins.includes(origin)) {
-      throw new Error(`Origin ${origin} is not accepted`);
+    if (!id) {
+      throw new Error("Id is required");
     }
 
-    // Fail if the message does no have a valid id.
-    if (typeof id !== "number" && typeof id !== "string") {
-      throw new Error("Id is required and must be a string or number");
-    }
-
-    // Fail if the message does not have a supported action.
     if (!Object.values(Action).includes(action)) {
-      throw new Error(`Action ${action} is not supported`);
+      throw new Error(`Action is not supported`);
     }
 
-    // Fails if the key provided is not a string.
-    if ([Action.SET, Action.GET, Action.REMOVE].includes(action) && (typeof key !== "string" || !key.length)) {
-      throw new Error("Key must be a non empty string");
+    if (typeof user !== "string") {
+      throw new Error("User is required and must be a string");
     }
 
-    // Fails if the value provided is not a string.
-    if ([Action.SET].includes(action) && (typeof value !== "string" || !value.length)) {
-      throw new Error("Value must be a non empty string");
-    }
+    const key = `single-sign-on-identity-${user}`;
 
     switch (action as Action) {
-      case Action.SET: {
-        localStorage.setItem(key, value);
-        postResponse({});
-        break;
-      }
-
       case Action.GET: {
-        const value = localStorage.getItem(key);
-        postResponse({ value });
+        postMessage({ identity: localStorage.getItem(key) });
         break;
       }
 
-      case Action.REMOVE: {
-        localStorage.removeItem(key);
-        postResponse({});
+      case Action.STORE: {
+        localStorage.setItem(key, identity);
+        postMessage();
         break;
       }
 
       case Action.CLEAR: {
-        localStorage.clear();
-        postResponse({});
+        localStorage.removeItem(key);
+        postMessage();
       }
     }
   } catch (e) {
-    const message = (e as Error).message;
-    postResponse({ error: message });
+    postMessage({ error: (e as Error).message });
   }
 });
