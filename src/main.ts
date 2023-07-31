@@ -28,7 +28,7 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
   };
 
   try {
-    if (!acceptedOrigins.includes(origin)) {
+    if (acceptedOrigins.length && !acceptedOrigins.includes(origin)) {
       throw new Error(`Origin is not accepted`);
     }
 
