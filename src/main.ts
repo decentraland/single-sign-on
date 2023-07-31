@@ -53,7 +53,7 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
       }
 
       case Action.STORE: {
-        localStorage.setItem(key, identity);
+        localStorage.setItem(key, JSON.stringify(identity));
         postMessage();
         break;
       }
