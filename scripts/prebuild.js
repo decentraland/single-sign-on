@@ -4,8 +4,6 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
-console.log('foo')
-
 let ENV_CONTENT = {}
 
 // read files
