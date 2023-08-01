@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && node scripts/postbuild.js",
+    "build": "node scripts/pre.js && tsc && vite build && node scripts/post.js",
     "preview": "vite preview"
   },
   "devDependencies": {
