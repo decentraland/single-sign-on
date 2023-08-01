@@ -1,0 +1,39 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+jobs:
+  build-release:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Set package.json version
+        uses: menduz/oddish-action@3.1.0
+        with:
+          deterministic-snapshot: true
+          only-update-versions: true
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Publish
+        uses: menduz/oddish-action@3.1.0
+        with:
+          cwd: ./dist
+          deterministic-snapshot: true
+          registry-url: "https://registry.npmjs.org"
+          access: public
+          gitlab-token: ${{ secrets.GITLAB_CDN_DEPLOYER_TOKEN }}
+          gitlab-pipeline-url: ${{ secrets.GITLAB_CDN_DEPLOYER_URL }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

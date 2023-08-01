@@ -1,5 +1,5 @@
 {
-  "name": "@dcl/single-sign-on",
+  "name": "@dcl/single-sign-on-site",
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
