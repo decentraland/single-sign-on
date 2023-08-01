@@ -12,6 +12,8 @@ if (fs.existsSync('.env')) {
 }
 const packageJson = JSON.parse(fs.readFileSync('./package.json').toString())
 
+console.log('foo')
+
 // set version
 ENV_CONTENT['REACT_APP_WEBSITE_VERSION'] = packageJson.version
 
