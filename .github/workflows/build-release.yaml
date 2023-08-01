@@ -29,7 +29,6 @@ jobs:
       - name: Publish
         uses: menduz/oddish-action@3.1.0
         with:
-          cwd: ./dist
           deterministic-snapshot: true
           registry-url: "https://registry.npmjs.org"
           access: public
