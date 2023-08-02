@@ -2,6 +2,7 @@ export enum Action {
   GET = "get",
   STORE = "store",
   CLEAR = "clear",
+  PING = "ping",
 }
 
 export type Payload = {

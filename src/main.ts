@@ -63,6 +63,12 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
       case Action.CLEAR: {
         localStorage.removeItem(key);
         postMessage();
+        break;
+      }
+
+      case Action.PING: {
+        localStorage.removeItem(key);
+        postMessage();
       }
     }
   } catch (e) {
