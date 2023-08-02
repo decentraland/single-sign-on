@@ -44,7 +44,9 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
       throw new Error("User is required and must be a string");
     }
 
-    const key = `single-sign-on-identity-${user}`;
+    const lcUser = user.toLowerCase();
+
+    const key = `single-sign-on-identity-${lcUser}`;
 
     switch (action as Action) {
       case Action.GET: {
