@@ -73,7 +73,8 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
 
     switch (action as Action) {
       case Action.GET: {
-        postMessage({ identity: localStorage.getItem(key) });
+        const identity = localStorage.getItem(key);
+        postMessage({ identity: identity ? JSON.parse(identity) : null });
         break;
       }
 
