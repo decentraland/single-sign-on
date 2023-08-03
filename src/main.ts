@@ -25,12 +25,12 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
     return;
   }
 
-  const postMessage = (extra: PostMessageExtraArgs = {}) => {
+  const postMessage = (payload: PostMessageExtraArgs) => {
     window.parent.postMessage(
       {
         target: expectedTarget,
         id,
-        ...extra,
+        ...payload,
       },
       origin
     );
@@ -73,19 +73,18 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
 
       case Action.STORE: {
         localStorage.setItem(key, JSON.stringify(identity));
-        postMessage();
+        postMessage({});
         break;
       }
 
       case Action.CLEAR: {
         localStorage.removeItem(key);
-        postMessage();
+        postMessage({});
         break;
       }
 
       case Action.PING: {
-        localStorage.removeItem(key);
-        postMessage();
+        postMessage({});
       }
     }
   } catch (e) {
