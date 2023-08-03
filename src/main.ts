@@ -53,6 +53,12 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
       throw new Error(`Action is not supported`);
     }
 
+    // If the action is a simple ping, just respond the message
+    if (action === Action.PING) {
+      postMessage({});
+      return;
+    }
+
     // Fail if the user is not a string
     // Users should be the string of an ethereum address
     if (typeof user !== "string") {
@@ -81,10 +87,6 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
         localStorage.removeItem(key);
         postMessage({});
         break;
-      }
-
-      case Action.PING: {
-        postMessage({});
       }
     }
   } catch (e) {
