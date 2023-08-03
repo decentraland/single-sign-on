@@ -61,8 +61,8 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
 
     // Fail if the user is not a string
     // Users should be the string of an ethereum address
-    if (typeof user !== "string") {
-      throw new Error("User is required and must be a string");
+    if (typeof user !== "string" || !user.length) {
+      throw new Error("User is required and must be a non empty string");
     }
 
     // Lowercasing the user to prevent issues with case sensitivity
