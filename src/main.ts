@@ -46,7 +46,7 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
 
     const lcUser = user.toLowerCase();
 
-    const key = `single-sign-on-identity-${lcUser}`;
+    const key = `single-sign-on-${lcUser}`;
 
     switch (action as Action) {
       case Action.GET: {
