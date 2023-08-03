@@ -1,6 +1,10 @@
 import { Action, Payload, PostMessageExtraArgs } from "./types";
 
-const acceptedOrigins: string[] = [];
+// Accepts messages only from:
+// All decentraland subdomains (https://*.decentraland.org .today and .zone)
+// All decentraland vercel deployments (https://*-decentraland1.vercel.app)
+// All projects running on localhost (http://localhost:*)
+const allow = /(^https:\/\/.+(\.decentraland.(org|today|zone)|-decentraland1.vercel.app)$|http:\/\/localhost:)/;
 const expectedTarget = "single-sign-on";
 
 window.addEventListener("message", (event: MessageEvent<Payload | null | undefined>) => {
@@ -28,7 +32,7 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
   };
 
   try {
-    if (acceptedOrigins.length && !acceptedOrigins.includes(origin)) {
+    if (!allow.test(origin)) {
       throw new Error(`Origin is not accepted`);
     }
 
