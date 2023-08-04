@@ -1,4 +1,5 @@
-import { Action, Payload, PostMessageExtraArgs } from "./types";
+import { Action, ClientMessage, ServerMessage } from "@dcl/single-sign-on-client";
+import { AuthIdentity } from "@dcl/crypto";
 
 // Accepts messages only from:
 // All decentraland subdomains (https://*.decentraland.org .today and .zone)
@@ -10,7 +11,7 @@ const allow = /(^https:\/\/.+(\.decentraland.(org|today|zone)|-decentraland1.ver
 // Also used for the response so the client can identify the message along the id
 const expectedTarget = "single-sign-on";
 
-window.addEventListener("message", (event: MessageEvent<Payload | null | undefined>) => {
+window.addEventListener("message", (event: MessageEvent<Partial<ClientMessage> | null>) => {
   const { origin, data } = event;
 
   // Ignore if there is no data in the message
@@ -25,7 +26,7 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
     return;
   }
 
-  const postMessage = (payload: PostMessageExtraArgs) => {
+  const postMessage = (payload: Pick<ServerMessage, "identity" | "error">) => {
     window.parent.postMessage(
       {
         target: expectedTarget,
@@ -49,7 +50,7 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
     }
 
     // Fail if the provided action is not supported
-    if (!Object.values(Action).includes(action)) {
+    if (!Object.values(Action).includes(action as any)) {
       throw new Error(`Action is not supported`);
     }
 
@@ -73,8 +74,16 @@ window.addEventListener("message", (event: MessageEvent<Payload | null | undefin
 
     switch (action as Action) {
       case Action.GET: {
-        const identity = localStorage.getItem(key);
-        postMessage({ identity: identity ? JSON.parse(identity) : null });
+        const identitySerialized = localStorage.getItem(key);
+        // Parsing into an object as it can travel like that in a message and there is no need for the client to parse it themselves
+        const identityParsed = identitySerialized ? (JSON.parse(identitySerialized) as AuthIdentity) : null;
+
+        if (identityParsed) {
+          // Convert the expiration back to Date to prevent issues
+          identityParsed.expiration = new Date(identityParsed.expiration);
+        }
+
+        postMessage({ identity: identityParsed });
         break;
       }
 
