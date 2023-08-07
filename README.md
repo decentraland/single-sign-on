@@ -28,11 +28,11 @@ This allows identities, which previously were store in the local storage of many
 
 ## Allowed origins
 
-Only a couple origins are allowed to interact with this webapp through messages.
+Only applications deployed on decentraland subdomains and in the same environment will be able to communicate with this iframe.
 
-This is a safety mechanism to prevent any non decentraland app from obtaining the identity of the user.
+For example, if the application is deployed in https://id.decentraland.org, only applications deployed in other decentraland.org subdomains will be able to use it.
 
-The accepted origins are all applications deployed to the decentraland domain https://\*.decentraland.org (.today and .zone as well) and all applications deployed to vercel with the decentraland account, all of which have a https://\*-decentraland1.vercel.app url.
+This is a safety mechanism to limit which applications can access the data contained in the iframe.
 
 ## Allowed messages
 
