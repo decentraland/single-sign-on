@@ -5,16 +5,13 @@ import {
   localStorageClearIdentity,
   localStorageGetIdentity,
   localStorageStoreIdentity,
+  SINGLE_SIGN_ON_TARGET,
 } from "@dcl/single-sign-on-client";
 
 // Accepts messages only from:
 // All decentraland subdomains (https://*.decentraland.org .today and .zone)
 // All decentraland vercel deployments (https://*-decentraland1.vercel.app)
 const allow = /^https:\/\/.+(\.decentraland.(org|today|zone)|-decentraland1.vercel.app)$/;
-
-// What messages targeted to this iframe should include as event.data.target
-// Also used for the response so the client can identify the message along the id
-const expectedTarget = "single-sign-on";
 
 // Check if the current environment is being run in development mode.
 // In development mode, the iframe will allow messages from any origin
@@ -31,7 +28,7 @@ window.addEventListener("message", (event: MessageEvent<Partial<ClientMessage> |
   const { target, id, action, user, identity } = data;
 
   // Ignore if target is not the expected one
-  if (target !== expectedTarget) {
+  if (target !== SINGLE_SIGN_ON_TARGET) {
     return;
   }
 
@@ -43,7 +40,7 @@ window.addEventListener("message", (event: MessageEvent<Partial<ClientMessage> |
   const postMessage = (payload: Pick<ServerMessage, "identity" | "error">) => {
     window.parent.postMessage(
       {
-        target: expectedTarget,
+        target: SINGLE_SIGN_ON_TARGET,
         id,
         ...payload,
       },
