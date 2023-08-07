@@ -38,12 +38,12 @@ The accepted origins are all applications deployed to the decentraland domain ht
 
 All messages, to be regarded as valid and not be discarded, must have the following properties:
 
-*target* - Which should always be "single-sign-on" this is used to identify that the message is in fact, targeted to this iframe. There are cases like with metamask, that they just send messages to iframe. Those kind of messages are ignored.
+**target** - Which should always be "single-sign-on" this is used to identify that the message is in fact, targeted to this iframe. There are cases like with metamask, that they just send messages to iframe. Those kind of messages are ignored.
 
-*id* - Used to identify the message. This is needed so that the client can verify which message is the response of a sent message.
+**id** - Used to identify the message. This is needed so that the client can verify which message is the response of a sent message.
 
-*action* - Can be "get", "store", "clear" or "ping". This one indicates the type of interaction had with the iframe.
+**action** - Can be "get", "store", "clear" or "ping". This one indicates the type of interaction had with the iframe.
 
-*user* - Only required for "get", "store" and "clear" actions. Is the address of the user for which identity is interacted with.
+**user** - Only required for "get", "store" and "clear" actions. Is the address of the user for which identity is interacted with.
 
-*identity* - Only required for "store" actions. It is the identity of the users, as provided by `@dcl/crypto`, that will be stored.
+**identity** - Only required for "store" actions. It is the identity of the users, as provided by `@dcl/crypto`, that will be stored.
