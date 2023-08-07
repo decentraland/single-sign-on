@@ -8,14 +8,19 @@ import {
   SINGLE_SIGN_ON_TARGET,
 } from "@dcl/single-sign-on-client";
 
-// Accepts messages only from:
-// All decentraland subdomains (https://*.decentraland.org .today and .zone)
-// All decentraland vercel deployments (https://*-decentraland1.vercel.app)
-const allow = /^https:\/\/.+(\.decentraland.(org|today|zone)|-decentraland1.vercel.app)$/;
-
 // Check if the current environment is being run in development mode.
 // In development mode, the iframe will allow messages from any origin
 const isDevelopment = import.meta.env.MODE === "development";
+
+// Regex used to check if the application is hosted in a decentraland subdomain.
+// Also used to check if messages come from a decentraland subdomain.
+const isDclSubdomainPattern = new RegExp(".+.decentraland.(org|today|zone)$");
+
+// Stores if the application is hosted in a decentraland subdomain.
+const isHostedInDclSubdomain = isDclSubdomainPattern.test(window.location.hostname);
+
+// If hosted in a decentraland subdomain, store the environment (org, today or zone).
+const env: string | null = isHostedInDclSubdomain ? window.location.hostname.split(".").slice(-1)[0] : null;
 
 window.addEventListener("message", (event: MessageEvent<Partial<ClientMessage> | null>) => {
   const { origin, data } = event;
@@ -55,9 +60,11 @@ window.addEventListener("message", (event: MessageEvent<Partial<ClientMessage> |
   }
 
   try {
-    // Fail if the origin is not allowed
-    if (!isDevelopment && !allow.test(origin)) {
-      throw new Error(`Origin is not accepted`);
+    // If the application is not being run in development mode (via npm run dev), It will check if the message comes from a decentraland subdomain.
+    // It will also check that the message comes from the same environment as the application.
+    // This means that if the application is running in https://id.decentraland.org, it will only accept messages from https://some-other-subdomain.decentraland.org.
+    if (!isDevelopment && (!isDclSubdomainPattern.test(origin) || !origin.endsWith(`.${env}`))) {
+      throw new Error(`Origin is not allowed`);
     }
 
     // Fail if the provided action is not supported
