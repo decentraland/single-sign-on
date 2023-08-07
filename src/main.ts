@@ -14,7 +14,7 @@ const isDevelopment = import.meta.env.MODE === "development";
 
 // Regex used to check if the application is hosted in a decentraland subdomain.
 // Also used to check if messages come from a decentraland subdomain.
-const isDclSubdomainPattern = new RegExp(".+.decentraland.(org|today|zone)$");
+const isDclSubdomainPattern = /.\.decentraland\.(org|today|zone)$/;
 
 // Stores if the application is hosted in a decentraland subdomain.
 const isHostedInDclSubdomain = isDclSubdomainPattern.test(window.location.hostname);
