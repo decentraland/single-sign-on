@@ -9,6 +9,7 @@
   "devDependencies": {
     "@dcl/crypto": "^3.4.3",
     "@dcl/single-sign-on-client": "^0.0.14",
+    "@dcl/single-sign-on-client-2": "file:../single-sign-on-client/dcl-single-sign-on-client-2.0.2.tgz",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   },
