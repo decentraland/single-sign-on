@@ -3,8 +3,8 @@ import { handler as handlerV2 } from "./handler/v2";
 import { Action as ActionV1 } from "@dcl/single-sign-on-client";
 import { Action as ActionV2 } from "@dcl/single-sign-on-client-2";
 
-const actionsV1 = Object.values(ActionV1).filter((v) => isNaN(Number(v)));
-const actionsV2 = Object.values(ActionV2).filter((v) => isNaN(Number(v)));
+const actionsV1 = Object.values(ActionV1);
+const actionsV2 = Object.values(ActionV2);
 
 window.addEventListener("message", (event: MessageEvent) => {
   if (event.data) {
