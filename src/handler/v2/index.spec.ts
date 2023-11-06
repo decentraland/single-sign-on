@@ -652,5 +652,27 @@ describe("when handling a v2 client message", () => {
         );
       });
     });
+
+    describe("when there is an expired identity stored", () => {
+      beforeEach(() => {
+        mockIdentity.expiration = new Date(0);
+        global.localStorage.getItem = jest.fn().mockReturnValue(JSON.stringify(mockIdentity));
+      });
+
+      it("should post a message with an ok response and null in the payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+            payload: null,
+          },
+          event.origin
+        );
+      });
+    });
   });
 });
