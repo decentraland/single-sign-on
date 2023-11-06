@@ -17,18 +17,21 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
     case Action.SET_CONNECTION_DATA: {
       console.log("SSO received SET_CONNECTION_DATA");
 
+      let response: Omit<ServerMessage, "target"> = {
+        id: event.data.id,
+        action: Action.SET_CONNECTION_DATA,
+        ok: true,
+      };
+
       try {
         LocalStorageUtils.setConnectionData((event.data.payload as ConnectionData | null) ?? null);
       } catch (e) {
-        postMessage(
-          { id: event.data.id, action: Action.SET_CONNECTION_DATA, ok: false, payload: (e as Error).message },
-          event.origin
-        );
-
-        return;
+        response.ok = false;
+        response.payload = (e as Error).message;
       }
 
-      postMessage({ id: event.data.id, action: Action.SET_CONNECTION_DATA, ok: true }, event.origin);
+      postMessage(response, event.origin);
+
       break;
     }
 
@@ -44,9 +47,23 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
 
     case Action.SET_IDENTITY: {
       console.log("SSO received SET_IDENTITY");
-      const { address, identity } = event.data.payload as IdentityPayload;
-      LocalStorageUtils.setIdentity(address, identity);
-      postMessage({ id: event.data.id, action: Action.SET_IDENTITY, ok: true }, event.origin);
+
+      let response: Omit<ServerMessage, "target"> = {
+        id: event.data.id,
+        action: Action.SET_IDENTITY,
+        ok: true,
+      };
+
+      try {
+        const { address, identity } = event.data.payload as IdentityPayload;
+        LocalStorageUtils.setIdentity(address, identity);
+      } catch (e) {
+        response.ok = false;
+        response.payload = (e as Error).message;
+      }
+
+      postMessage(response, event.origin);
+
       break;
     }
 
