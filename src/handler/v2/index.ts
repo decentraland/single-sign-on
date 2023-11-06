@@ -57,8 +57,13 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
     }
 
     case Action.GET_IDENTITY: {
-      const identity = LocalStorageUtils.getIdentity(event.data.payload as string);
-      response.payload = identity;
+      try {
+        const identity = LocalStorageUtils.getIdentity(event.data.payload as string);
+        response.payload = identity;
+      } catch (e) {
+        response.ok = false;
+        response.payload = (e as Error).message;
+      }
       window.parent.postMessage(response, event.origin);
       break;
     }

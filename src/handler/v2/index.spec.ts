@@ -443,4 +443,101 @@ describe("when handling a v2 client message", () => {
       });
     });
   });
+
+  describe(`when the action is ${Action.GET_IDENTITY}`, () => {
+    let event: MessageEvent;
+
+    beforeEach(() => {
+      event = {
+        data: { target: SINGLE_SIGN_ON_TARGET, id: 1, action: Action.GET_IDENTITY, payload: mockAddress },
+        origin: "https://example.com",
+      } as MessageEvent;
+    });
+
+    describe("when the payload is not a valid address", () => {
+      beforeEach(() => {
+        event.data.payload = "invalid";
+      });
+
+      it("should post a message with a not ok response and the error in the payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: false,
+            payload:
+              'Invalid address: [{"instancePath":"","schemaPath":"#/pattern","keyword":"pattern","params":{"pattern":"^0x[a-fA-F0-9]{40}$"},"message":"must match pattern \\"^0x[a-fA-F0-9]{40}$\\""}]',
+          },
+          event.origin
+        );
+      });
+    });
+
+    describe("when there is no stored identity", () => {
+      beforeEach(() => {
+        global.localStorage.getItem = jest.fn().mockReturnValue(null);
+      });
+
+      it("should post a message with an ok response and null payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+            payload: null,
+          },
+          event.origin
+        );
+      });
+    });
+
+    describe("when there is a valid identity stored", () => {
+      beforeEach(() => {
+        global.localStorage.getItem = jest.fn().mockReturnValue(JSON.stringify(mockIdentity));
+      });
+
+      it("should post a message with an ok response and the identity as payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+            payload: mockIdentity,
+          },
+          event.origin
+        );
+      });
+    });
+
+    describe("when there is a invalid identity stored", () => {
+      beforeEach(() => {
+        global.localStorage.getItem = jest.fn().mockReturnValue("{}");
+      });
+
+      it("should post a message with a not ok response and the error in the payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: false,
+            payload:
+              'Invalid auth identity: [{"instancePath":"","schemaPath":"#/required","keyword":"required","params":{"missingProperty":"ephemeralIdentity"},"message":"must have required property \'ephemeralIdentity\'"}]',
+          },
+          event.origin
+        );
+      });
+    });
+  });
 });
