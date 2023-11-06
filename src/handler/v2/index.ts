@@ -9,7 +9,7 @@ import {
 } from "@dcl/single-sign-on-client-2";
 
 export const handler = (event: MessageEvent<ClientMessage>) => {
-  if (event.data.target !== SINGLE_SIGN_ON_TARGET || !event.data.id) {
+  if (event.data.target !== SINGLE_SIGN_ON_TARGET || !event.data.id || !isValidOrigin(event.origin)) {
     return;
   }
 
@@ -72,4 +72,25 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
 
 export function init() {
   window.parent.postMessage({ target: SINGLE_SIGN_ON_TARGET, id: -1, action: Action.INIT, ok: true }, "*");
+}
+
+export function isValidOrigin(origin: string): boolean {
+  const currentHostname = new URL(window.location.toString()).hostname;
+
+  if (currentHostname === "localhost") {
+    return true;
+  }
+
+  if (
+    !currentHostname.endsWith(".decentraland.org") &&
+    !currentHostname.endsWith(".decentraland.today") &&
+    !currentHostname.endsWith(".decentraland.zone")
+  ) {
+    return true;
+  }
+
+  const env = currentHostname.split(".").slice(-1)[0];
+  const originHostname = new URL(origin).hostname;
+
+  return originHostname.endsWith(`.decentraland.${env}`);
 }

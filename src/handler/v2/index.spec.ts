@@ -16,6 +16,7 @@ let mockAddress: string;
 let mockConnectionData: ConnectionData;
 let mockIdentity: AuthIdentity;
 let mockIdentityPayload: IdentityPayload;
+let mockOrigin: string;
 
 beforeEach(() => {
   ogWindow = global.window;
@@ -27,6 +28,7 @@ beforeEach(() => {
     parent: {
       postMessage: mockPostMessage,
     },
+    location: "http://localhost:3000",
   } as unknown as typeof window;
 
   global.localStorage = {
@@ -34,6 +36,8 @@ beforeEach(() => {
     setItem: jest.fn(),
     removeItem: jest.fn(),
   } as unknown as typeof localStorage;
+
+  mockOrigin = "https://example.com";
 
   mockAddress = "0x24e5f44999c151f08609f8e27b2238c773c4d020";
 
@@ -99,6 +103,115 @@ describe("when handling a v2 client message", () => {
     it("should ignore the message", () => {
       handler({ data: { target: SINGLE_SIGN_ON_TARGET, id: 1, action: "invalid" } } as MessageEvent);
       expect(mockPostMessage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("when the app is hosted on localhost", () => {
+    it("should accept the message no matter were it comes from", () => {
+      const origins = ["http://localhost:5000", "https://google.com", "https://play.decentraland.org"];
+
+      for (const origin of origins) {
+        handler({
+          data: {
+            target: SINGLE_SIGN_ON_TARGET,
+            id: 1,
+            action: Action.GET_CONNECTION_DATA,
+          },
+          origin,
+        } as MessageEvent);
+
+        expect(mockPostMessage).toHaveBeenCalled();
+
+        jest.clearAllMocks();
+      }
+    });
+  });
+
+  describe("when the app location is id.decentraland.org", () => {
+    beforeEach(() => {
+      global.window.location = "https://id.decentraland.org" as any;
+    });
+
+    describe("and the message origin is from decentraland.org", () => {
+      beforeEach(() => {
+        mockOrigin = "https://decentraland.org";
+      });
+
+      it("should ignore the message", () => {
+        handler({
+          data: {
+            target: SINGLE_SIGN_ON_TARGET,
+            id: 1,
+            action: Action.GET_CONNECTION_DATA,
+          },
+          origin: mockOrigin,
+        } as MessageEvent);
+
+        expect(mockPostMessage).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("and the message origin is from play.decentraland.org", () => {
+      beforeEach(() => {
+        mockOrigin = "https://play.decentraland.org";
+      });
+
+      it("should accept the message", () => {
+        handler({
+          data: {
+            target: SINGLE_SIGN_ON_TARGET,
+            id: 1,
+            action: Action.GET_CONNECTION_DATA,
+          },
+          origin: mockOrigin,
+        } as MessageEvent);
+
+        expect(mockPostMessage).toHaveBeenCalled();
+      });
+    });
+
+    describe("and the message origin is from play.decentraland.zone", () => {
+      beforeEach(() => {
+        mockOrigin = "https://play.decentraland.zone";
+      });
+
+      it("should ignore the message", () => {
+        handler({
+          data: {
+            target: SINGLE_SIGN_ON_TARGET,
+            id: 1,
+            action: Action.GET_CONNECTION_DATA,
+          },
+          origin: mockOrigin,
+        } as MessageEvent);
+
+        expect(mockPostMessage).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("when the app location is example.com", () => {
+    beforeEach(() => {
+      global.window.location = "https://example.com" as any;
+    });
+
+    it("should accept the message no matter were it comes from", () => {
+      const origins = ["http://localhost:5000", "https://google.com", "https://play.decentraland.org"];
+
+      for (const origin of origins) {
+        handler({
+          data: {
+            target: SINGLE_SIGN_ON_TARGET,
+            id: 1,
+            action: Action.GET_CONNECTION_DATA,
+          },
+          origin,
+        } as MessageEvent);
+
+        expect(mockPostMessage).toHaveBeenCalled();
+
+        jest.clearAllMocks();
+      }
     });
   });
 
