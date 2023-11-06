@@ -24,7 +24,7 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
       };
 
       try {
-        LocalStorageUtils.setConnectionData((event.data.payload as ConnectionData | null) ?? null);
+        LocalStorageUtils.setConnectionData(event.data.payload as ConnectionData | null);
       } catch (e) {
         response.ok = false;
         response.payload = (e as Error).message;

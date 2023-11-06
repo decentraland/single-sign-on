@@ -117,17 +117,21 @@ describe("when handling a v2 client message", () => {
         delete event.data.payload;
       });
 
-      it("should call LocalStorageUtils.setConnectionData with null", () => {
-        const spySetConnectionData = jest.spyOn(LocalStorageUtils, "setConnectionData");
+      it("should clear the connection data from local storage", () => {
         handler(event);
-        expect(spySetConnectionData).toHaveBeenCalledWith(null);
+        expect(global.localStorage.removeItem).toHaveBeenCalledWith(LocalStorageUtils.CONNECTION_DATA_KEY);
       });
 
       it(`should call window.parent.postMessage with an ok respose for the ${Action.SET_CONNECTION_DATA} action`, () => {
         handler(event);
 
         expect(mockPostMessage).toHaveBeenCalledWith(
-          { target: event.data.target, id: event.data.id, action: event.data.action, ok: true },
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+          },
           event.origin
         );
       });
@@ -138,17 +142,21 @@ describe("when handling a v2 client message", () => {
         event.data.payload = null;
       });
 
-      it("should call LocalStorageUtils.setConnectionData with null", () => {
-        const spySetConnectionData = jest.spyOn(LocalStorageUtils, "setConnectionData");
+      it("should clear the connection data from local storage", () => {
         handler(event);
-        expect(spySetConnectionData).toHaveBeenCalledWith(null);
+        expect(global.localStorage.removeItem).toHaveBeenCalledWith(LocalStorageUtils.CONNECTION_DATA_KEY);
       });
 
       it(`should call window.parent.postMessage with an ok respose for the ${Action.SET_CONNECTION_DATA} action`, () => {
         handler(event);
 
         expect(mockPostMessage).toHaveBeenCalledWith(
-          { target: event.data.target, id: event.data.id, action: event.data.action, ok: true },
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+          },
           event.origin
         );
       });
@@ -159,17 +167,24 @@ describe("when handling a v2 client message", () => {
         event.data.payload = mockConnectionData;
       });
 
-      it("should call LocalStorageUtils.setConnectionData with the valid connection data", () => {
-        const spySetConnectionData = jest.spyOn(LocalStorageUtils, "setConnectionData");
+      it("should store the connection data into local storage", () => {
         handler(event);
-        expect(spySetConnectionData).toHaveBeenCalledWith(event.data.payload);
+        expect(global.localStorage.setItem).toHaveBeenCalledWith(
+          LocalStorageUtils.CONNECTION_DATA_KEY,
+          JSON.stringify(event.data.payload)
+        );
       });
 
       it(`should call window.parent.postMessage with an ok respose for the ${Action.SET_CONNECTION_DATA} action`, () => {
         handler(event);
 
         expect(mockPostMessage).toHaveBeenCalledWith(
-          { target: event.data.target, id: event.data.id, action: event.data.action, ok: true },
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+          },
           event.origin
         );
       });
@@ -179,12 +194,6 @@ describe("when handling a v2 client message", () => {
       beforeEach(() => {
         event.data.payload = mockConnectionData;
         event.data.payload.address = "invalid";
-      });
-
-      it("should call LocalStorageUtils.setConnectionData with the invalid connection data", () => {
-        const spySetConnectionData = jest.spyOn(LocalStorageUtils, "setConnectionData");
-        handler(event);
-        expect(spySetConnectionData).toHaveBeenCalledWith(event.data.payload);
       });
 
       it(`should call window.parent.postMessage with a not ok respose for the ${Action.SET_CONNECTION_DATA} action`, () => {
@@ -208,12 +217,6 @@ describe("when handling a v2 client message", () => {
       beforeEach(() => {
         event.data.payload = mockConnectionData;
         event.data.payload.provider = "invalid";
-      });
-
-      it("should call LocalStorageUtils.setConnectionData with the invalid connection data", () => {
-        const spySetConnectionData = jest.spyOn(LocalStorageUtils, "setConnectionData");
-        handler(event);
-        expect(spySetConnectionData).toHaveBeenCalledWith(event.data.payload);
       });
 
       it(`should call window.parent.postMessage with a not ok respose for the ${Action.SET_CONNECTION_DATA} action`, () => {
@@ -340,6 +343,14 @@ describe("when handling a v2 client message", () => {
     describe("when the identity payload is valid", () => {
       beforeEach(() => {
         event.data.payload = mockIdentityPayload;
+      });
+
+      it("should store the connection data into local storage", () => {
+        handler(event);
+        expect(global.localStorage.setItem).toHaveBeenCalledWith(
+          `${LocalStorageUtils.IDENTITY_KEY}-${mockAddress}`,
+          JSON.stringify(event.data.payload.identity)
+        );
       });
 
       it(`should call window.parent.postMessage with an ok respose for the ${Action.SET_IDENTITY} action`, () => {
