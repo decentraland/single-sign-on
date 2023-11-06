@@ -33,8 +33,13 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
     }
 
     case Action.GET_CONNECTION_DATA: {
-      const connectionData = LocalStorageUtils.getConnectionData();
-      response.payload = connectionData;
+      try {
+        const connectionData = LocalStorageUtils.getConnectionData();
+        response.payload = connectionData;
+      } catch (e) {
+        response.ok = false;
+        response.payload = (e as Error).message;
+      }
       window.parent.postMessage(response, event.origin);
       break;
     }

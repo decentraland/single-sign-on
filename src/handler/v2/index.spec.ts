@@ -368,4 +368,79 @@ describe("when handling a v2 client message", () => {
       });
     });
   });
+
+  describe(`when the action is ${Action.GET_CONNECTION_DATA}`, () => {
+    let event: MessageEvent;
+
+    beforeEach(() => {
+      event = {
+        data: { target: SINGLE_SIGN_ON_TARGET, id: 1, action: Action.GET_CONNECTION_DATA },
+        origin: "https://example.com",
+      } as MessageEvent;
+    });
+
+    describe("when there is no stored connection data", () => {
+      beforeEach(() => {
+        global.localStorage.getItem = jest.fn().mockReturnValue(null);
+      });
+
+      it("should post a message with an ok response and null payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+            payload: null,
+          },
+          event.origin
+        );
+      });
+    });
+
+    describe("when there is a valid connection data stored", () => {
+      beforeEach(() => {
+        global.localStorage.getItem = jest.fn().mockReturnValue(JSON.stringify(mockConnectionData));
+      });
+
+      it("should post a message with an ok response and null payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: true,
+            payload: mockConnectionData,
+          },
+          event.origin
+        );
+      });
+    });
+
+    describe("when there is an invalid connection data stored", () => {
+      beforeEach(() => {
+        global.localStorage.getItem = jest.fn().mockReturnValue("{}");
+      });
+
+      it("should post a message with an ok response and null payload", () => {
+        handler(event);
+
+        expect(mockPostMessage).toHaveBeenCalledWith(
+          {
+            target: event.data.target,
+            id: event.data.id,
+            action: event.data.action,
+            ok: false,
+            payload:
+              'Invalid connection data: [{"instancePath":"","schemaPath":"#/required","keyword":"required","params":{"missingProperty":"address"},"message":"must have required property \'address\'"}]',
+          },
+          event.origin
+        );
+      });
+    });
+  });
 });
