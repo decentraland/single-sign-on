@@ -16,8 +16,19 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
   switch (event.data.action) {
     case Action.SET_CONNECTION_DATA: {
       console.log("SSO received SET_CONNECTION_DATA");
-      LocalStorageUtils.setConnectionData(event.data.payload as ConnectionData | null);
-      postMessage({ id: event.data.id, action: Action.SET_IDENTITY, ok: true }, event.origin);
+
+      try {
+        LocalStorageUtils.setConnectionData((event.data.payload as ConnectionData | null) ?? null);
+      } catch (e) {
+        postMessage(
+          { id: event.data.id, action: Action.SET_CONNECTION_DATA, ok: false, payload: (e as Error).message },
+          event.origin
+        );
+
+        return;
+      }
+
+      postMessage({ id: event.data.id, action: Action.SET_CONNECTION_DATA, ok: true }, event.origin);
       break;
     }
 
@@ -52,7 +63,9 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
   }
 };
 
-postMessage({ id: -1, action: Action.INIT, ok: true }, "*");
+export function init() {
+  postMessage({ id: -1, action: Action.INIT, ok: true }, "*");
+}
 
 function postMessage(message: Omit<ServerMessage, "target">, origin: string) {
   window.parent.postMessage({ target: SINGLE_SIGN_ON_TARGET, ...message }, origin);
