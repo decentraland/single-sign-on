@@ -28,7 +28,6 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
         response.ok = false;
         response.payload = (e as Error).message;
       }
-      window.parent.postMessage(response, event.origin);
       break;
     }
 
@@ -40,7 +39,6 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
         response.ok = false;
         response.payload = (e as Error).message;
       }
-      window.parent.postMessage(response, event.origin);
       break;
     }
 
@@ -52,7 +50,6 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
         response.ok = false;
         response.payload = (e as Error).message;
       }
-      window.parent.postMessage(response, event.origin);
       break;
     }
 
@@ -64,10 +61,14 @@ export const handler = (event: MessageEvent<ClientMessage>) => {
         response.ok = false;
         response.payload = (e as Error).message;
       }
-      window.parent.postMessage(response, event.origin);
       break;
     }
+
+    default:
+      return;
   }
+
+  window.parent.postMessage(response, event.origin);
 };
 
 export function init() {
