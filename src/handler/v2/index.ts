@@ -78,10 +78,6 @@ export function init() {
 export function isValidOrigin(origin: string): boolean {
   const currentHostname = new URL(window.location.toString()).hostname;
 
-  if (currentHostname === "localhost") {
-    return true;
-  }
-
   if (
     !currentHostname.endsWith(".decentraland.org") &&
     !currentHostname.endsWith(".decentraland.today") &&
