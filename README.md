@@ -2,7 +2,7 @@
 
 This webapp works as a centralized storage for shared data between different decentraland applications.
 
-It is intended to be instanced as an iframe inside the different dapps using the [@dcl/single-sign-on-client](https://github.com/decentraland/single-sign-on-client).
+It is intended to be instantiated as an iframe inside the different dapps using the [@dcl/single-sign-on-client](https://github.com/decentraland/single-sign-on-client).
 
 ## V1
 
