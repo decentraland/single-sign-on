@@ -14,7 +14,7 @@ This version will not receive future updates. As version 2 is the recommended on
 
 It is still currently supported by the SSO webapp to keep support applications that have not yet migrated to V2.
 
-Handled messages have to follow the schema:
+Handled messages follow the schema:
 
 ```ts
 type ClientMessage = {
