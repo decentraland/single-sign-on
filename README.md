@@ -1,49 +1,75 @@
 # Single Sign On
 
-Webapp intended to be used as an iframe.
+This webapp works as a centralized storage for shared data between different decentraland applications.
 
-Contains the logic to Get, Store and Clear the user identity.
+It is intended to be instantiated as an iframe inside the different dapps using the [@dcl/single-sign-on-client](https://github.com/decentraland/single-sign-on-client).
 
-The idea of this project is to have unified place in which the identity of the user can be stored.
+## V1
 
-This replaces the need of each application storing it by themselves, making the user have to sign a message when logging in on each app.
+Supports storing, clearing and obtaining the user identity via post messages.
 
-## Integration
+Version 0.1.0 or lower of the `@dcl/single-sign-on-client` has to be used to easily communicate with it.
 
-The simplest way to use it is by using the corresponding client in the application it needs to be integrated in.
+This version will not receive future updates. As version 2 is the recommended one.
 
-https://github.com/decentraland/single-sign-on-client <- Client Repo
+It is still currently supported by the SSO webapp to keep support applications that have not yet migrated to V2.
 
-Just check the README on that repo for instructions.
+Handled messages follow the schema:
 
-## How it works
+```ts
+type ClientMessage = {
+  target: "single-sign-on";
+  id: number; // Greater than 0.
+  action?: "get" | "store" | "clear" | "ping";
+  user?: string; // the address of the user when storing, clearing or obtaining their identity.
+  identity?: AuthIdentity | null; // the identity of the user when storing it.
+};
+```
 
-This webapp is deployed to https://id.decentraland.org (as well as .today and .zone).
+Responses have the schema:
 
-The app consists of a single message handler that picks messages intended to interact with it.
+```ts
+type ServerMessage = {
+  target: "single-sign-on";
+  id: number; // Same as the client message.
+  identity?: AuthIdentity | null; // The identity of the user for the "get" action.
+  error?: string; // Only when there was an error on the operation.
+};
+```
 
-The kind of messages accepted are to operate with user identities (Get, Store, Clear). These messages will be interpreted and the application will work on its own local storage to the respond to the client.
+# V2
 
-This allows identities, which previously were store in the local storage of many different dapps, to be stored just in https://id.decentraland.org. Meaning that any dapp can consume the identity from this single place instead of making the user have their own different identity in each different decentraland dapp.
+Latest and current version to be used.
+
+It supports storing, clearing and obtaining the user identity, as well as the same for the user's connection data.
+
+Handled messages have to follow the schema:
+
+```ts
+type ClientMessage = {
+  target: "single-sign-on";
+  id: number; // Greater than 0;
+  action: "get-identity" | "set-identity" | "get-connection-data" | "set-connection-data";
+  payload?: ConnectionData | IdentityPayload | string | null; // Depends on the action.
+};
+```
+
+Responses have the schema:
+
+```ts
+type ServerMessage = {
+  target: "single-sign-on";
+  id: number; // Same as the client message.
+  action: "get-identity" | "set-identity" | "get-connection-data" | "set-connection-data";
+  ok: boolean; // false if the operation fails for any reason.
+  payload?: ConnectionData | AuthIdentity | string | null; // Depends on the action. If ok is false, the payload will be a string with the error message.
+};
+```
 
 ## Allowed origins
 
-Only applications deployed on decentraland subdomains and in the same environment will be able to communicate with this iframe.
+Depending on were this application is hosted, it will validate the origin of the messages received. If the application is hosted on a Decentraland subdomain (.decentraland.org, .decentraland.today, .decentraland.zone), it will validate that the origin of the received messages are from a decentraland subdomain on the same environment. For example, if this application is hosted on https://id.decentraland.org, it will only allow messages from other https://*.decentraland.org sites.
 
-For example, if the application is deployed in https://id.decentraland.org, only applications deployed in other decentraland.org subdomains will be able to use it.
+If the application is hosted on another domain, being localhost or anything else, no origin validation takes place.
 
-This is a safety mechanism to limit which applications can access the data contained in the iframe.
-
-## Allowed messages
-
-All messages, to be regarded as valid and not be discarded, must have the following properties:
-
-**target** - Which should always be "single-sign-on" this is used to identify that the message is in fact, targeted to this iframe. There are cases like with metamask, that they just send messages to iframe. Those kind of messages are ignored.
-
-**id** - Used to identify the message. This is needed so that the client can verify which message is the response of a sent message.
-
-**action** - Can be "get", "store", "clear" or "ping". This one indicates the type of interaction had with the iframe.
-
-**user** - Only required for "get", "store" and "clear" actions. Is the address of the user for which identity is interacted with.
-
-**identity** - Only required for "store" actions. It is the identity of the users, as provided by `@dcl/crypto`, that will be stored.
+Works like this for both versions of the iframe.
