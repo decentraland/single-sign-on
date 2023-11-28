@@ -16,7 +16,7 @@ const isDevelopment = import.meta.env.MODE === "development";
 // Stores if the application is hosted in a decentraland domain.
 const isHostedInDclDomain = isDclDomainPattern.test(window.location.hostname);
 
-// If hosted in a decentraland subdomain, store the environment (org, today or zone).
+// If hosted in decentraland, store the environment (org, today or zone).
 const env: string | null = isHostedInDclDomain ? window.location.hostname.split(".").slice(-1)[0] : null;
 
 export const handler = (event: MessageEvent<Partial<ClientMessage> | null>) => {
