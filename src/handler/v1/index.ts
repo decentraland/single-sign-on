@@ -7,20 +7,17 @@ import {
   localStorageStoreIdentity,
   SINGLE_SIGN_ON_TARGET,
 } from "@dcl/single-sign-on-client";
+import { isDclDomainPattern } from "../shared";
 
 // Check if the current environment is being run in development mode.
 // In development mode, the iframe will allow messages from any origin
 const isDevelopment = import.meta.env.MODE === "development";
 
-// Regex used to check if the application is hosted in a decentraland subdomain.
-// Also used to check if messages come from a decentraland subdomain.
-const isDclSubdomainPattern = /.\.decentraland\.(org|today|zone)$/;
+// Stores if the application is hosted in a decentraland domain.
+const isHostedInDclDomain = isDclDomainPattern.test(window.location.hostname);
 
-// Stores if the application is hosted in a decentraland subdomain.
-const isHostedInDclSubdomain = isDclSubdomainPattern.test(window.location.hostname);
-
-// If hosted in a decentraland subdomain, store the environment (org, today or zone).
-const env: string | null = isHostedInDclSubdomain ? window.location.hostname.split(".").slice(-1)[0] : null;
+// If hosted in decentraland, store the environment (org, today or zone).
+const env: string | null = isHostedInDclDomain ? window.location.hostname.split(".").slice(-1)[0] : null;
 
 export const handler = (event: MessageEvent<Partial<ClientMessage> | null>) => {
   const { origin, data } = event;
@@ -63,7 +60,7 @@ export const handler = (event: MessageEvent<Partial<ClientMessage> | null>) => {
     // If the application is not being run in development mode (via npm run dev), It will check if the message comes from a decentraland subdomain.
     // It will also check that the message comes from the same environment as the application.
     // This means that if the application is running in https://id.decentraland.org, it will only accept messages from https://some-other-subdomain.decentraland.org.
-    if (!isDevelopment && (!isDclSubdomainPattern.test(origin) || !origin.endsWith(`.${env}`))) {
+    if (!isDevelopment && (!isDclDomainPattern.test(origin) || !origin.endsWith(`.${env}`))) {
       throw new Error(`Origin is not allowed`);
     }
 

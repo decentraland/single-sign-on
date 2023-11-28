@@ -137,7 +137,7 @@ describe("when handling a v2 client message", () => {
         mockOrigin = "https://decentraland.org";
       });
 
-      it("should ignore the message", () => {
+      it("should accept the message", () => {
         handler({
           data: {
             target: SINGLE_SIGN_ON_TARGET,
@@ -147,7 +147,7 @@ describe("when handling a v2 client message", () => {
           origin: mockOrigin,
         } as MessageEvent);
 
-        expect(mockPostMessage).not.toHaveBeenCalled();
+        expect(mockPostMessage).toHaveBeenCalled();
       });
     });
 
