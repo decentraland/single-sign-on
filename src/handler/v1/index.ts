@@ -13,7 +13,7 @@ import { isDclDomainPattern } from "../shared";
 // In development mode, the iframe will allow messages from any origin
 const isDevelopment = import.meta.env.MODE === "development";
 
-// Stores if the application is hosted in a decentraland subdomain.
+// Stores if the application is hosted in a decentraland domain.
 const isHostedInDclDomain = isDclDomainPattern.test(window.location.hostname);
 
 // If hosted in a decentraland subdomain, store the environment (org, today or zone).
